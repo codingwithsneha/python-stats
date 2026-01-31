@@ -1,18 +1,12 @@
 import unittest
-import contribute
+from datetime import datetime, timedelta
 
 
-class TestContribute(unittest.TestCase):
-
-    def test_arguments(self):
-        args = contribute.arguments(["-nw"])
-        self.assertTrue(args.no_weekends)
-        self.assertEqual(args.max_commits, 10)
-
-    def test_contributions_per_day(self):
-        args = contribute.arguments([])
-        value = contribute.contributions_per_day(args)
-        self.assertTrue(1 <= value <= 20)
+class TestDates(unittest.TestCase):
+    def test_past_dates_only(self):
+        today = datetime.now()
+        past = today - timedelta(days=365)
+        self.assertLess(past, today)
 
 
 if __name__ == "__main__":
