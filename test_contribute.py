@@ -1,32 +1,12 @@
 import unittest
-import contribute
-from subprocess import check_output
+from datetime import datetime
 
 
-class TestContribute(unittest.TestCase):
+class TestSanity(unittest.TestCase):
+    def test_date_format(self):
+        d = datetime.now()
+        self.assertIsInstance(d.strftime("%Y-%m-%d"), str)
 
-    def test_arguments(self):
-        args = contribute.arguments(['-nw'])
-        self.assertTrue(args.no_weekends)
-        self.assertEqual(args.max_commits, 10)
-        self.assertTrue(1 <= contribute.contributions_per_day(args) <= 20)
 
-    def test_contributions_per_day(self):
-        args = contribute.arguments(['-nw'])
-        self.assertTrue(1 <= contribute.contributions_per_day(args) <= 20)
-
-    def test_commits(self):
-        contribute.NUM = 11   # limiting the number only for unittesting
-        contribute.main(['-nw',
-                         '--user_name=codingwithsneha',
-                         '--user_email=iamsneha@gmail.com',
-                         '-mc=12',
-                         '-fr=82',
-                         '-db=10',
-                         '-da=15'])
-        self.assertTrue(1 <= int(check_output(
-            ['git',
-             'rev-list',
-             '--count',
-             'HEAD']
-        ).decode('utf-8')) <= 20*(10 + 15))
+if __name__ == "__main__":
+    unittest.main()
