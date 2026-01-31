@@ -27,7 +27,7 @@ def contribute(commit_time):
 
 
 def main():
-    TOTAL_DAYS = 3
+    TOTAL_DAYS = 365
     MAX_COMMITS_PER_DAY = 5
     FREQUENCY = 70       # % chance per day
     SKIP_WEEKENDS = False
@@ -58,7 +58,7 @@ def main():
             )
             contribute(commit_time)
 
-        run(["git", "push", "origin", "main"])
+        run(["git", "push", "--force", "origin", "main"])
     print("✅ Contributions for last 365 days pushed successfully")
 
 
