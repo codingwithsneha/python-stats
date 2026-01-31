@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import argparse
 import os
 import sys
@@ -8,7 +7,8 @@ from subprocess import Popen
 
 
 def run(cmd):
-    Popen(cmd).wait()
+    process = Popen(cmd)
+    process.wait()
 
 
 def message(date):
@@ -35,11 +35,11 @@ def contribute(date):
 
 
 def arguments(argv):
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="GitHub contribution generator")
     parser.add_argument("-nw", "--no_weekends", action="store_true")
     parser.add_argument("-mc", "--max_commits", type=int, default=10)
     parser.add_argument("-fr", "--frequency", type=int, default=80)
-    parser.add_argument("-db", "--days_before", type=int, default=20)
+    parser.add_argument("-db", "--days_before", type=int, default=10)
     parser.add_argument("-da", "--days_after", type=int, default=0)
     return parser.parse_args(argv)
 
@@ -47,13 +47,12 @@ def arguments(argv):
 def main(argv=sys.argv[1:]):
     args = arguments(argv)
 
-    repo_url = "https://github.com/codingwithsneha/python-stats.git"
+    # ⚠️ CHANGE ONLY IF YOUR REPO NAME IS DIFFERENT
     repo_name = "python-stats"
 
-    if not os.path.exists(repo_name):
-        run(["git", "clone", repo_url])
-
-    os.chdir(repo_name)
+    # Must be run INSIDE the repo
+    if not os.path.exists(".git"):
+        sys.exit("❌ ERROR: Run this script inside your git repository")
 
     run(["git", "config", "user.name", "codingwithsneha"])
     run(["git", "config", "user.email", "iamsneha@gmail.com"])
@@ -76,7 +75,7 @@ def main(argv=sys.argv[1:]):
     run(["git", "pull", "--rebase", "origin", "main"])
     run(["git", "push", "origin", "main"])
 
-    print("✅ Repository updated successfully")
+    print("✅ Contributions pushed successfully")
 
 
 if __name__ == "__main__":
