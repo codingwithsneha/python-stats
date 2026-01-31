@@ -47,8 +47,8 @@ def arguments(argv):
 def main(argv=sys.argv[1:]):
     args = arguments(argv)
 
-    repo_url = "https://github.com/codingwithsneha/grow-project.git"
-    repo_name = "grow-project"
+    repo_url = "https://github.com/codingwithsneha/python-stats.git"
+    repo_name = "python-stats"
 
     if not os.path.exists(repo_name):
         run(["git", "clone", repo_url])
