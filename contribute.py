@@ -1,5 +1,4 @@
 import argparse
-import os
 import sys
 from datetime import datetime, timedelta
 from random import randint
@@ -7,16 +6,16 @@ from subprocess import Popen
 
 
 def run(cmd):
-    process = Popen(cmd)
-    process.wait()
+    p = Popen(cmd)
+    p.wait()
 
 
 def message(date):
     return date.strftime("Contribution: %Y-%m-%d %H:%M")
 
 
-def contributions_per_day(args):
-    return randint(1, min(args.max_commits, 20))
+def contributions_per_day(max_commits):
+    return randint(1, min(max_commits, 20))
 
 
 def contribute(date):
@@ -35,47 +34,48 @@ def contribute(date):
 
 
 def arguments(argv):
-    parser = argparse.ArgumentParser(description="GitHub contribution generator")
+    parser = argparse.ArgumentParser(description="Generate GitHub contributions for last 365 days")
+    parser.add_argument("-mc", "--max_commits", type=int, default=8, help="max commits per day")
+    parser.add_argument("-fr", "--frequency", type=int, default=70, help="chance per day (0-100)")
     parser.add_argument("-nw", "--no_weekends", action="store_true")
-    parser.add_argument("-mc", "--max_commits", type=int, default=10)
-    parser.add_argument("-fr", "--frequency", type=int, default=80)
-    parser.add_argument("-db", "--days_before", type=int, default=10)
-    parser.add_argument("-da", "--days_after", type=int, default=0)
     return parser.parse_args(argv)
 
 
 def main(argv=sys.argv[1:]):
     args = arguments(argv)
 
-    # ⚠️ CHANGE ONLY IF YOUR REPO NAME IS DIFFERENT
-    repo_name = "python-stats"
+    if not (run(["git", "rev-parse", "--is-inside-work-tree"]) is None):
+        pass
 
-    # Must be run INSIDE the repo
-    if not os.path.exists(".git"):
-        sys.exit("❌ ERROR: Run this script inside your git repository")
-
+    # IMPORTANT: email MUST match GitHub email
     run(["git", "config", "user.name", "codingwithsneha"])
     run(["git", "config", "user.email", "iamsneha@gmail.com"])
 
-    start_date = datetime.now() - timedelta(days=args.days_before)
-    total_days = args.days_before + args.days_after
+    today = datetime.now()
+    start_date = today - timedelta(days=365)
 
-    for i in range(total_days):
+    for i in range(365):
         day = start_date + timedelta(days=i)
 
         if args.no_weekends and day.weekday() >= 5:
             continue
 
-        if randint(0, 100) > args.frequency:
+        if randint(1, 100) > args.frequency:
             continue
 
-        for _ in range(contributions_per_day(args)):
-            contribute(day)
+        commits_today = contributions_per_day(args.max_commits)
+
+        for n in range(commits_today):
+            commit_time = day.replace(
+                hour=randint(9, 22),
+                minute=randint(0, 59)
+            )
+            contribute(commit_time)
 
     run(["git", "pull", "--rebase", "origin", "main"])
     run(["git", "push", "origin", "main"])
 
-    print("✅ Contributions pushed successfully")
+    print("✅ 365 days of contributions pushed successfully")
 
 
 if __name__ == "__main__":
